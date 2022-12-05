@@ -1,0 +1,49 @@
+When writing database migrations with Ecto, it's important to make sure that the changes you make to your schema are safe and reversible. Ecto provides a number of functions and macros that you can use to ensure that your migrations are applied correctly and without causing any errors or data loss.
+
+    Use import Ecto.Query at the top of your migration file to gain access to the query macro. This macro allows you to easily write Ecto queries in your migration, which can be useful for selecting specific columns or rows to update or delete.
+
+    Use alter/3 to safely update your table schema by first using query to select the columns you want to update, then using update/2 to apply the changes. This allows you to make changes to your schema in a controlled and reversible way.
+
+    Use rename_all/2 to safely rename multiple columns at once. This can be useful if you want to rename a group of columns that have a common prefix or suffix, or if you want to make consistent changes to the names of several columns at once.
+
+    Use delete/2 to safely delete columns from your table. This ensures that any data in the deleted columns is preserved in case you need to roll back the migration.
+
+    Use change/3 to safely change the type of a column. This is useful if you need to modify the type of a column to support a new feature or data type in your application.
+
+    Use add/3 to safely add a new column to your table. This allows you to add new columns without affecting the existing data in your table.
+
+    Use create_table/2 to safely create a new table. This is useful if you need to add a new table to your schema to support a new feature or data type in your application.
+
+    Use drop_table/2 to safely delete a table. This ensures that any data in the deleted table is preserved in case you need to roll back the migration.
+
+    Use create_index/4 to safely create an index on a table. This can improve the performance of your database queries by allowing the database engine to quickly find the rows
+
+This is useful when you need to make changes to your database schema and want to ensure that the changes are applied correctly and consistently.
+
+To use a model safely in a migration, you need to first ensure that the model is up-to-date with the current schema. This can be done by calling the Ecto.Migrator.with_repo/3 function, which will automatically run any pending migrations before running the code inside the block.
+
+Once the model is up-to-date, you can use it inside the migration by calling the Ecto.Repo.all/3 function to query the database and retrieve the relevant records. You can then use the returned data to make any necessary changes, such as updating or deleting records, or adding new associations.
+
+Here is an example of how you might use a model safely in a migration:
+
+```elixir
+defmodule MyApp.Repo.Migrations.AddEmailToUsers do
+  use Ecto.Migration
+
+  def change do
+    Ecto.Migrator.with_repo(MyApp.Repo) do
+      # Get all users from the database
+      users = MyApp.User |> MyApp.Repo.all
+
+      # Iterate over the users and update each one with the new email field
+      for user <- users do
+        user
+        |> Ecto.Changeset.change(email: "")
+        |> MyApp.Repo.update
+      end
+    end
+  end
+end
+```
+
+In this example, the MyApp.Repo.Migrations.AddEmailToUsers migration uses the MyApp.User model to retrieve all users from the database and add a new email field to each record. By calling Ecto.Migrator.with_repo/3 first, the migration ensures that the model is up-to-date with the current schema before using it to query the database.
